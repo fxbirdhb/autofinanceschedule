@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="appClientModule"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="owner.project.facets" value="java"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="lib" path="externaljar/activemq-all-5.9.1.jar"/>
+	<classpathentry kind="lib" path="externaljar/bson-3.0.4.jar"/>
+	<classpathentry kind="lib" path="externaljar/commons-beanutils.jar"/>
+	<classpathentry kind="lib" path="externaljar/commons-codec-1.9.jar"/>
+	<classpathentry kind="lib" path="externaljar/commons-collections.jar"/>
+	<classpathentry kind="lib" path="externaljar/commons-lang.jar"/>
+	<classpathentry kind="lib" path="externaljar/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="externaljar/commons-logging.jar"/>
+	<classpathentry kind="lib" path="externaljar/ezmorph-1.0.6.jar"/>
+	<classpathentry kind="lib" path="externaljar/fluent-hc-4.5.1.jar"/>
+	<classpathentry kind="lib" path="externaljar/httpclient-4.5.1.jar"/>
+	<classpathentry kind="lib" path="externaljar/httpclient-cache-4.5.1.jar"/>
+	<classpathentry kind="lib" path="externaljar/httpclient-win-4.5.1.jar"/>
+	<classpathentry kind="lib" path="externaljar/httpcore-4.4.3.jar"/>
+	<classpathentry kind="lib" path="externaljar/httpmime-4.5.1.jar"/>
+	<classpathentry kind="lib" path="externaljar/jackson-core-asl-1.9.9.jar"/>
+	<classpathentry kind="lib" path="externaljar/jackson-mapper-asl-1.9.9.jar"/>
+	<classpathentry kind="lib" path="externaljar/jafka-1.2.1.jar"/>
+	<classpathentry kind="lib" path="externaljar/javax.jms.jar"/>
+	<classpathentry kind="lib" path="externaljar/jms.jar"/>
+	<classpathentry kind="lib" path="externaljar/jna-4.1.0.jar"/>
+	<classpathentry kind="lib" path="externaljar/jna-platform-4.1.0.jar"/>
+	<classpathentry kind="lib" path="externaljar/jopt-simple-4.3.jar"/>
+	<classpathentry kind="lib" path="externaljar/json-lib-2.4-jdk15.jar"/>
+	<classpathentry kind="lib" path="externaljar/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="externaljar/mongodb-driver-3.0.4.jar"/>
+	<classpathentry kind="lib" path="externaljar/mongodb-driver-core-3.0.4.jar"/>
+	<classpathentry kind="lib" path="externaljar/mysql-connector-java-5.1.30-bin.jar"/>
+	<classpathentry kind="lib" path="externaljar/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="externaljar/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="lib" path="externaljar/zkclient-2.0.jar"/>
+	<classpathentry kind="lib" path="externaljar/zookeeper-3.4.5.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>
