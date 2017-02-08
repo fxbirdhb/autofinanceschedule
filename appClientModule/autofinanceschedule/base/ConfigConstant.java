@@ -2,7 +2,7 @@ package autofinanceschedule.base;
 
 public class ConfigConstant {
 	
-	public static final String OPERATIONLOG_PHYADDRESS = "/Users/lihongbo/products/智金/data/financeforcedata.log";
+	public static final String OPERATIONLOG_PHYADDRESS = "/Users/lihongbo/products/autofinanceschedule/log/autofinanceschedulelog.log";
 
 	public static final String 	STOCKCONTNET_GETTING = " is being gotten.";
 	
@@ -48,7 +48,7 @@ public class ConfigConstant {
 	
 	public static final String XUEQIU_TOKEN_NAME = "xq_a_token";
 	
-	public static final String XUEQIU_TOKEN = "137ca18191dc98e8b7750bb7c5d3acf92cef1158";
+	public static final String XUEQIU_TOKEN = "e0063421cf2e5f461398008ef7446bdd390dc2af";
 	
 	public static final String TEMPFILE_MONTHDATA = "monthdata@";
 	

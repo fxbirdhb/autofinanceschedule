@@ -11,7 +11,7 @@ public class GetCurrentPriceFromXueqiu extends OperationAPIBase {
 		
 		String result = "It is done";
 		
-		Stock.updateCurrentPrice(db, datestamp);
+		//Stock.updateCurrentPrice(db, datestamp);
 		
 		return result;
 	}

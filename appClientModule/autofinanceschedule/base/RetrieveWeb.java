@@ -196,7 +196,7 @@ public class RetrieveWeb {
 		 
 	    final HttpGet request = new HttpGet(address);
 	 
-	    Builder config = RequestConfig.custom().setConnectTimeout(120);
+	    Builder config = RequestConfig.custom().setConnectTimeout(150000);
 	    
 	    request.setConfig(config.build());
 	    

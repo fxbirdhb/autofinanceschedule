@@ -21,6 +21,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.UpdateOptions;
 
 import autofinanceschedule.base.*;
+import autofinanceschedule.log.logbase;
 
 public class Stock {
 
@@ -29,11 +30,11 @@ public class Stock {
 	 * @param db
 	 * @throws Exception
 	 */
-	static public void updateCurrentPrice(MainDB db, String datestamp) throws Exception {
+	static public void updateCurrentPrice(MainDB db, String datestamp, logbase log) throws Exception {
 		
-		updateForTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSHDAYDATA, "SH");
+		updateForTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSHDAYDATA, "SH", log);
 		
-		updateForTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSZDAYDATA, "SZ");
+		updateForTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSZDAYDATA, "SZ", log);
 	}
 	
 	/**
@@ -44,7 +45,7 @@ public class Stock {
 	 * @param base
 	 * @throws Exception
 	 */
-	static public void updateForTrader(MainDB db, String datestamp, String trader, String base) throws Exception {
+	static public void updateForTrader(MainDB db, String datestamp, String trader, String base, logbase log) throws Exception {
 	    
 	    UpdateOptions option = new UpdateOptions();
 		
@@ -56,6 +57,8 @@ public class Stock {
 				.append("code", 1)
 				.append("lastdate", 1));
 		
+		int updatecount = 0;
+		
 		for(Iterator<Document> i = rs.iterator(); i.hasNext();) {
 			
 			Document item = i.next();
@@ -64,7 +67,7 @@ public class Stock {
 			
 			Date lastdate = item.getDate("lastdate");
 			
-			long begin = lastdate.getTime() + (24 * 3600 * 1000);
+			long begin = lastdate.getTime();// - (24 * 3600 * 1000);
 			
 			long end = (new Date()).getTime();
 			
@@ -92,9 +95,13 @@ public class Stock {
 								.append("after", new Document()
 										.append("$each", after)
 										.append("$sort", new Document("time", -1)))), option);
+				
+				updatecount++;
 			
-			}
+			} 
 		}
+		
+		log.InsertLog("update the " + base + " market for " + updatecount + " stocks \n");
 		
 	}
 
@@ -632,7 +639,7 @@ public class Stock {
 		
 		FindIterable<Document> rs = db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKRZRQTOTAL).find();
 		
-		rs = rs.sort(new Document("rrdate", 1));
+		rs = rs.sort(new Document("rrdate", -1));
 		
 		rs = rs.limit(1);
 		
@@ -833,9 +840,16 @@ public class Stock {
 	 * @param pagesize
 	 * @throws Exception
 	 */
-	static public void updateCurrentRZRQAllStock(MainDB db, int pagesize) throws Exception {
+	static public void updateCurrentRZRQAllStock(MainDB db, int pagesize,  logbase log) throws Exception {
 		
 		FindIterable<Document> rs = db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKRZRQ).find();
+		
+		rs = rs.projection(new Document()
+				.append("code", 1)
+				.append("name", 1)
+				.append("base", 1));
+		
+		int updatecount = 0;
 		
 		for (Iterator<Document> i = rs.iterator(); i.hasNext();) {
 			
@@ -847,9 +861,14 @@ public class Stock {
 			
 			String base = item.getString("base");
 			
-			Stock.updateCurrentRZRQStock(db, code, base, name, pagesize);
-			
+			if (Stock.updateCurrentRZRQStock(db, code, base, name, pagesize)) {
+				
+				updatecount++;
+				
+			}
 		}
+		
+		log.InsertLog("update rzrq " + updatecount + " stocks \n");
 	}
 	/**
 	 * update the rzrq data of the stock named the code
@@ -858,7 +877,8 @@ public class Stock {
 	 * @param pagesize
 	 * @throws Exception
 	 */
-	static public void updateCurrentRZRQStock(MainDB db, String code, String name, String base, int pagesize) throws Exception {
+	@SuppressWarnings("unchecked")
+	static public boolean updateCurrentRZRQStock(MainDB db, String code, String name, String base, int pagesize) throws Exception {
 		
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyy-MM-dd");
 		
@@ -866,7 +886,7 @@ public class Stock {
 		
 		if (alldata.isEmpty()) {
 			
-			return;
+			return false;
 			
 		}
 		UpdateOptions option = new UpdateOptions();
@@ -875,8 +895,16 @@ public class Stock {
 		
 		FindIterable<Document> rs = db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKRZRQ).find(new Document("code", code));
 		
-		List<Document> rzrqlist = rs.projection(new Document("rzrq", 1)).into(new ArrayList<Document>());
+		rs = rs.projection(new Document("rzrq", 1));
+
+		List<Document> rzrqlist  = null;
 		
+		if (rs.iterator().hasNext()) {
+			
+			rzrqlist = (ArrayList<Document>)rs.first().get("rzrq");
+			
+		}
+				
 		LocalDate lastdate = LocalDate.parse("1900-01-01", formatter);
 		
 		if (rzrqlist.size() > 0) {
@@ -918,11 +946,19 @@ public class Stock {
 			}
 		}
 		
-		db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKRZRQ).updateOne(new Document("code", code), new Document()
-				.append("$addToSet", new Document("rzrq", new Document()
-						.append("$each", needupdate)
-						.append("$sort", new Document("rrdate", 1)))), option);
+		if (needupdate.size() > 0) {
 		
+			db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKRZRQ).updateOne(new Document("code", code), new Document()
+				.append("$push", new Document("rzrq", new Document()
+						.append("$each", needupdate)
+						.append("$sort", new Document("rrdate", -1)))), option);
+		
+			return true;
+		
+		} else {
+			
+			return false;
+		}
 	}
 	/**
 	 * get the rzrq data of the stock
