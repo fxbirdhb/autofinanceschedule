@@ -2,6 +2,8 @@ package autofinanceschedule.base;
 
 import java.util.Date;
 
+import org.bson.Document;
+
 import autofinanceschedule.func.Stock;
 import autofinanceschedule.log.SimpleLog;
 import autofinanceschedule.log.logbase;
@@ -23,7 +25,25 @@ public class Main {
 			log.InsertLog("\n---------------update at " + (new Date()).toString() + "----------------------\n");
 			
 			log.InsertLog("\n------update all stocks price---------\n");
+			
+			Document doc = ConfigFile.getConfig();
+			
+			String xqcookiename = "";
+			
+			String xqcookietoken = "";
+			
+			if (doc != null) {
+				
+				xqcookiename = doc.getString("xqcookiename");
+				
+				xqcookietoken = doc.getString("xqcookietoken");
+				
+			}
 
+			Stock.xqcookiename = xqcookiename;
+			
+			Stock.xqcookietoken = xqcookietoken;
+			
 			//update the trade price 
 			
 			Stock.updateCurrentPrice(db, "2017", log);

@@ -25,6 +25,10 @@ import autofinanceschedule.log.logbase;
 
 public class Stock {
 
+	static public String xqcookiename = ConfigConstant.XUEQIU_TOKEN_NAME;
+	
+	static public String xqcookietoken = ConfigConstant.XUEQIU_TOKEN;
+	
 	/**
 	 * Update current prices of two share markets
 	 * @param db
@@ -132,7 +136,7 @@ public class Stock {
 		
 		BasicCookieStore cookieStore = new BasicCookieStore();
 
-	    BasicClientCookie cookie = new BasicClientCookie(ConfigConstant.XUEQIU_TOKEN_NAME, ConfigConstant.XUEQIU_TOKEN);
+	    BasicClientCookie cookie = new BasicClientCookie(xqcookiename, xqcookietoken);
 	    
 	    cookie.setDomain(".xueqiu.com");
 	    
@@ -194,7 +198,7 @@ public class Stock {
 
 		BasicCookieStore cookieStore = new BasicCookieStore();
 
-	    BasicClientCookie cookie = new BasicClientCookie(ConfigConstant.XUEQIU_TOKEN_NAME, ConfigConstant.XUEQIU_TOKEN);
+	    BasicClientCookie cookie = new BasicClientCookie(xqcookiename, xqcookietoken);
 	    
 	    cookie.setDomain(".xueqiu.com");
 	    
@@ -258,7 +262,7 @@ public class Stock {
 		
 		BasicCookieStore cookieStore = new BasicCookieStore();
 
-	    BasicClientCookie cookie = new BasicClientCookie("xq_a_token", ConfigConstant.XUEQIU_TOKEN);
+	    BasicClientCookie cookie = new BasicClientCookie(xqcookiename, xqcookietoken);
 	    
 	    cookie.setDomain(".xueqiu.com");
 	    
@@ -325,7 +329,7 @@ public class Stock {
 		
 		BasicCookieStore cookieStore = new BasicCookieStore();
 
-	    BasicClientCookie cookie = new BasicClientCookie("xq_a_token", ConfigConstant.XUEQIU_TOKEN);
+	    BasicClientCookie cookie = new BasicClientCookie(xqcookiename, xqcookietoken);
 	    
 	    cookie.setDomain(".xueqiu.com");
 	    

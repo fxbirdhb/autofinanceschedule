@@ -3,6 +3,8 @@ package autofinanceschedule.base;
 public class ConfigConstant {
 	
 	public static final String OPERATIONLOG_PHYADDRESS = "/Users/lihongbo/products/autofinanceschedule/log/autofinanceschedulelog.log";
+	
+	public static final String CONFIGFILE_DIR = "/Users/lihongbo/products/autofinanceschedule/config/config.af";
 
 	public static final String 	STOCKCONTNET_GETTING = " is being gotten.";
 	
