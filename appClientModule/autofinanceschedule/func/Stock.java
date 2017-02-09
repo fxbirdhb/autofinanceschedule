@@ -59,6 +59,12 @@ public class Stock {
 		
 		int updatecount = 0;
 		
+		LocalDate date = LocalDate.now();
+		  
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		  
+		String version = date.format(formatter);
+		
 		for(Iterator<Document> i = rs.iterator(); i.hasNext();) {
 			
 			Document item = i.next();
@@ -84,6 +90,7 @@ public class Stock {
 				db.getDb().getCollection(trader).updateOne(new Document("code", code), new Document()
 						.append("$set", new Document()
 								.append("lastdate", newlastdate)
+								.append("version", version)
 								.append("updatedate", new Date()))
 						.append("$push", new Document()
 								.append("normal", new Document()

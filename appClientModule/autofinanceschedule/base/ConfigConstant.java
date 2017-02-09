@@ -48,7 +48,7 @@ public class ConfigConstant {
 	
 	public static final String XUEQIU_TOKEN_NAME = "xq_a_token";
 	
-	public static final String XUEQIU_TOKEN = "e0063421cf2e5f461398008ef7446bdd390dc2af";
+	public static final String XUEQIU_TOKEN = "01b36c9240f85c0ad4f9a5defab39ce136ff3deb";
 	
 	public static final String TEMPFILE_MONTHDATA = "monthdata@";
 	
