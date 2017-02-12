@@ -1,5 +1,7 @@
 package autofinanceschedule.base;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.Date;
 
 import org.bson.Document;
@@ -18,6 +20,15 @@ public class Main {
 		
 		try {
 			
+			LocalDate ldate = LocalDate.now();
+			
+			//as sunday and monday not to update the data
+			
+			if (ldate.getDayOfWeek() == DayOfWeek.SUNDAY || ldate.getDayOfWeek() == DayOfWeek.MONDAY) {
+				
+				return;
+				
+			}
 			MainDB db = new MainDB(true);
 			
 			logbase log = new SimpleLog(ConfigConstant.OPERATIONLOG_PHYADDRESS);
