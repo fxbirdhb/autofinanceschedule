@@ -84,7 +84,9 @@ public class Stock {
 			List<Document> normal = getCurrentPrice(db, trader, code, base, "1day", "normal", begin, end);
 
 			if ((normal != null) && (!normal.isEmpty())) {
-			
+				
+				computePriceTrend(db, code, base, normal.get(0));
+				
 				List<Document> before = getCurrentPrice(db, trader, code, base, "1day", "before", begin, end);
 				
 				List<Document> after = getCurrentPrice(db, trader, code, base, "1day", "after", begin, end);
@@ -212,19 +214,19 @@ public class Stock {
 			
 				Document item = rs.first();
 			
-				double minprice = 0.0;
+				double tailprice = 0.0;
 				
-				if (item.containsKey("minprice")) {
+				if (item.containsKey("tailprice")) {
 					
-					minprice = item.getDouble("minprice");
+					tailprice = item.getDouble("tailprice");
 					
 				}
 				
-				double maxprice = 0.0;
+				double headprice = 0.0;
 				
-				if (item.containsKey("maxprice")) {
+				if (item.containsKey("headprice")) {
 					
-					minprice = item.getDouble("maxprice");
+					headprice = item.getDouble("headprice");
 					
 				}
 				
@@ -234,17 +236,17 @@ public class Stock {
 				
 				Document newupdate = new Document();
 				
-				if (price > maxprice) {
+				if (price > headprice) {
 					
 					if (trend == 1) {
+						//上升趋势，股价阶段新高
+						double range = (price - tailprice) / tailprice;
 						
-						double range = (price - minprice) / minprice;
-						
-						newupdate.append("maxprice", price)
+						newupdate.append("headprice", price)
 						.append("during", during + 1)
 						.append("range", range)
 						.append("currentprice", price)
-						.append("maxupdate", new Date())
+						.append("headupdate", new Date())
 						.append("updatedate", new Date());
 						
 						db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
@@ -255,34 +257,54 @@ public class Stock {
 						
 					} else {
 						
-						double range = (price - minprice) / minprice;
+						if (price > tailprice) {
 						
-						newupdate.append("maxprice", price)
-						.append("during", during + 1)
-						.append("range", range)
-						.append("trend", 1)
-						.append("currentprice", price)
-						.append("maxupdate", new Date())
-						.append("updatedate", new Date());
+							//当前价格高于头部和尾部价格，趋势反转向上,原头部价格变为尾部价格
+							double range = (price - tailprice) / tailprice;
 						
-						db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
-								.append("$set", newupdate), option);
+							newupdate.append("headprice", price)
+							.append("tailprice", headprice)
+							.append("during", 1)
+							.append("range", range)
+							.append("trend", 1)
+							.append("currentprice", price)
+							.append("headupdate", new Date())
+							.append("tailupdate", new Date())
+							.append("updatedate", new Date());
 						
-						return;
+							db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
+									.append("$set", newupdate), option);
 						
+							return;
 						
+						} else {
+							
+							//趋势无变化，更新当前价格
+							newupdate.append("currentprice", price)
+							.append("during", during + 1)
+							.append("updatedate", new Date());
+						
+							db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
+									.append("$set", newupdate), option);
+						
+							return;
+							
+						}
 					}
-				} else if (price < minprice) {
+					
+				} else {
 					
 					if (trend == 0) {
 						
-						double range = (price - maxprice) / maxprice;
+						//下降趋势，股价阶段新低
 						
-						newupdate.append("minprice", price)
+						double range = (price - tailprice) / tailprice;
+						
+						newupdate.append("headprice", price)
 						.append("during", during + 1)
 						.append("range", range)
 						.append("currentprice", price)
-						.append("minupdate", new Date())
+						.append("headupdate", new Date())
 						.append("updatedate", new Date());
 						
 						db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
@@ -292,21 +314,39 @@ public class Stock {
 						
 					} else {
 						
-						double range = (price - maxprice) / maxprice;
+						if (price < tailprice) {
+							
+							//当前价格低于头部和尾部，趋势反转向下
+							
+							double range = (price - tailprice) / tailprice;
 						
-						newupdate.append("minprice", price)
-						.append("during", during + 1)
-						.append("range", range)
-						.append("trend", 0)
-						.append("currentprice", price)
-						.append("minupdate", new Date())
-						.append("updatedate", new Date());
+							newupdate.append("headprice", price)
+							.append("tailprice", headprice)
+							.append("during", 1)
+							.append("range", range)
+							.append("trend", 0)
+							.append("currentprice", price)
+							.append("headupdate", new Date())
+							.append("tailupdate", new Date())
+							.append("updatedate", new Date());
 						
-						db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
-								.append("$set", newupdate), option);
+							db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
+									.append("$set", newupdate), option);
 						
-						return;
+							return;
+						} else {
+							
+							//趋势无变化，更新当前价格
+							newupdate.append("currentprice", price)
+							.append("during", during + 1)
+							.append("updatedate", new Date());
 						
+							db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
+									.append("$set", newupdate), option);
+						
+							return;
+							
+						}
 						
 					}
 				}
