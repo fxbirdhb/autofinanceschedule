@@ -188,6 +188,134 @@ public class Stock {
 	}
 	
 	/**
+	 * 
+	 * @param db
+	 * @param code
+	 * @param base
+	 * @param currentprice
+	 */
+	static public void computePriceTrend(MainDB db, String code, String base, Document priceset) {
+		
+		UpdateOptions option = new UpdateOptions();
+		
+		option.upsert(true);
+		
+		Document filter = new Document("code", code);
+		
+		FindIterable<Document> rs = db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).find(filter);
+		
+		if (priceset.containsKey("close")) {
+		
+			double price = priceset.getDouble("close");
+		
+			if (rs.iterator().hasNext()) {
+			
+				Document item = rs.first();
+			
+				double minprice = 0.0;
+				
+				if (item.containsKey("minprice")) {
+					
+					minprice = item.getDouble("minprice");
+					
+				}
+				
+				double maxprice = 0.0;
+				
+				if (item.containsKey("maxprice")) {
+					
+					minprice = item.getDouble("maxprice");
+					
+				}
+				
+				int trend = item.getInteger("trend", 0);
+				
+				int during = item.getInteger("during", 0);
+				
+				Document newupdate = new Document();
+				
+				if (price > maxprice) {
+					
+					if (trend == 1) {
+						
+						double range = (price - minprice) / minprice;
+						
+						newupdate.append("maxprice", price)
+						.append("during", during + 1)
+						.append("range", range)
+						.append("currentprice", price)
+						.append("maxupdate", new Date())
+						.append("updatedate", new Date());
+						
+						db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
+								.append("$set", newupdate), option);
+						
+						return;
+						
+						
+					} else {
+						
+						double range = (price - minprice) / minprice;
+						
+						newupdate.append("maxprice", price)
+						.append("during", during + 1)
+						.append("range", range)
+						.append("trend", 1)
+						.append("currentprice", price)
+						.append("maxupdate", new Date())
+						.append("updatedate", new Date());
+						
+						db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
+								.append("$set", newupdate), option);
+						
+						return;
+						
+						
+					}
+				} else if (price < minprice) {
+					
+					if (trend == 0) {
+						
+						double range = (price - maxprice) / maxprice;
+						
+						newupdate.append("minprice", price)
+						.append("during", during + 1)
+						.append("range", range)
+						.append("currentprice", price)
+						.append("minupdate", new Date())
+						.append("updatedate", new Date());
+						
+						db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
+								.append("$set", newupdate), option);
+						
+						return;
+						
+					} else {
+						
+						double range = (price - maxprice) / maxprice;
+						
+						newupdate.append("minprice", price)
+						.append("during", during + 1)
+						.append("range", range)
+						.append("trend", 0)
+						.append("currentprice", price)
+						.append("minupdate", new Date())
+						.append("updatedate", new Date());
+						
+						db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
+								.append("$set", newupdate), option);
+						
+						return;
+						
+						
+					}
+				}
+			}
+		
+		}
+		
+	}
+	/**
 	 * Add tags for exact shares
 	 * @param db
 	 * @param tags

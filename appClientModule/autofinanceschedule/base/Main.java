@@ -29,13 +29,12 @@ public class Main {
 				return;
 				
 			}
+			
 			MainDB db = new MainDB(true);
 			
 			logbase log = new SimpleLog(ConfigConstant.OPERATIONLOG_PHYADDRESS);
 			
 			log.InsertLog("\n---------------update at " + (new Date()).toString() + "----------------------\n");
-			
-			log.InsertLog("\n------update all stocks price---------\n");
 			
 			Document doc = ConfigFile.getConfig();
 			
@@ -55,10 +54,6 @@ public class Main {
 			
 			Stock.xqcookietoken = xqcookietoken;
 			
-			//update the trade price 
-			
-			Stock.updateCurrentPrice(db, "2017", log);
-			
 			//update the total rzrq
 			
 			log.InsertLog("\n------update rzrq ---------\n");
@@ -71,6 +66,11 @@ public class Main {
 			
 			Stock.updateCurrentRZRQAllStock(db, 1, log);
 			
+			//update the trade price 
+			
+			log.InsertLog("\n------update all stocks price---------\n");
+			
+			Stock.updateCurrentPrice(db, "2017", log);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

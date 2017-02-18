@@ -28,5 +28,7 @@ public class DBDATA {
 	public static final String SOURCEDB_COLLECTION_STOCKRZRQTOTAL = "rzrqtotal";
 	
 	public static final String SOURCEDB_COLLECTION_STOCKRZRQ = "rzrqstock";
+	
+	public static final String SOURCEDB_COLLECTION_STOCKPRICETREND = "stockpricetrend";
 
 }
