@@ -64,4 +64,6 @@ public class ConfigConstant {
 	
 	public static final String MONTHDATA_TITLE = "代码,名称,年份,开盘价,收盘价,年涨跌幅,最高月收盘价,最低月收盘价,峰值涨跌幅 \n";
 	
+	public static final double PRICETRENDCONVERTPOINT = 0.05;
+	
 }

@@ -34,11 +34,11 @@ public class Stock {
 	 * @param db
 	 * @throws Exception
 	 */
-	static public void updateCurrentPrice(MainDB db, String datestamp, logbase log) throws Exception {
+	static public void updateCurrentPrice(MainDB db, String datestamp, double convert, logbase log) throws Exception {
 		
-		updateForTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSHDAYDATA, "SH", log);
+		updateForTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSHDAYDATA, "SH", convert, log);
 		
-		updateForTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSZDAYDATA, "SZ", log);
+		updateForTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSZDAYDATA, "SZ", convert, log);
 	}
 	
 	/**
@@ -49,7 +49,7 @@ public class Stock {
 	 * @param base
 	 * @throws Exception
 	 */
-	static public void updateForTrader(MainDB db, String datestamp, String trader, String base, logbase log) throws Exception {
+	static public void updateForTrader(MainDB db, String datestamp, String trader, String base, double convert, logbase log) throws Exception {
 	    
 	    UpdateOptions option = new UpdateOptions();
 		
@@ -85,7 +85,7 @@ public class Stock {
 
 			if ((normal != null) && (!normal.isEmpty())) {
 				
-				computePriceTrend(db, code, base, normal.get(0));
+				computePriceTrend(db, code, base, convert, normal.get(0));
 				
 				List<Document> before = getCurrentPrice(db, trader, code, base, "1day", "before", begin, end);
 				
@@ -196,7 +196,7 @@ public class Stock {
 	 * @param base
 	 * @param currentprice
 	 */
-	static public void computePriceTrend(MainDB db, String code, String base, Document priceset) {
+	static public void computePriceTrend(MainDB db, String code, String base, double convert, Document priceset) {
 		
 		UpdateOptions option = new UpdateOptions();
 		
@@ -214,7 +214,7 @@ public class Stock {
 			
 				Document item = rs.first();
 			
-				double tailprice = 0.0;
+				double tailprice = price;
 				
 				if (item.containsKey("tailprice")) {
 					
@@ -222,7 +222,7 @@ public class Stock {
 					
 				}
 				
-				double headprice = 0.0;
+				double headprice = price;
 				
 				if (item.containsKey("headprice")) {
 					
@@ -230,19 +230,21 @@ public class Stock {
 					
 				}
 				
-				int trend = item.getInteger("trend", 0);
+				int trend = item.getInteger("trend", 1);
 				
 				int during = item.getInteger("during", 0);
 				
 				Document newupdate = new Document();
 				
-				if (price > headprice) {
+				if (price >= headprice) {
 					
 					if (trend == 1) {
 						//上升趋势，股价阶段新高
 						double range = (price - tailprice) / tailprice;
 						
 						newupdate.append("headprice", price)
+						.append("tailprice", tailprice)
+						.append("trend", 1)
 						.append("during", during + 1)
 						.append("range", range)
 						.append("currentprice", price)
@@ -257,19 +259,20 @@ public class Stock {
 						
 					} else {
 						
-						if (price > tailprice) {
+						double convertrange = (price - headprice) / headprice;
 						
-							//当前价格高于头部和尾部价格，趋势反转向上,原头部价格变为尾部价格
-							double range = (price - tailprice) / tailprice;
+						if ((convertrange > convert) || (price > tailprice) ) {
+						
+							//当前价格高于头部的幅度超过限定值，趋势反转向上,原头部价格变为尾部价格
 						
 							newupdate.append("headprice", price)
 							.append("tailprice", headprice)
 							.append("during", 1)
-							.append("range", range)
+							.append("range", convertrange)
 							.append("trend", 1)
 							.append("currentprice", price)
 							.append("headupdate", new Date())
-							.append("tailupdate", new Date())
+							.append("convertupdate", new Date())
 							.append("updatedate", new Date());
 						
 							db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
@@ -279,8 +282,11 @@ public class Stock {
 						
 						} else {
 							
+							double range = (price - tailprice) / tailprice;
+							
 							//趋势无变化，更新当前价格
 							newupdate.append("currentprice", price)
+							.append("range", range)
 							.append("during", during + 1)
 							.append("updatedate", new Date());
 						
@@ -314,20 +320,20 @@ public class Stock {
 						
 					} else {
 						
-						if (price < tailprice) {
+						double convertrange = (price - headprice) / headprice;
+						
+						if ((Math.abs(convertrange) > convert) || (price < tailprice)) {
 							
-							//当前价格低于头部和尾部，趋势反转向下
-							
-							double range = (price - tailprice) / tailprice;
+							//当前价格低于头部超过限定值，趋势反转向下
 						
 							newupdate.append("headprice", price)
 							.append("tailprice", headprice)
 							.append("during", 1)
-							.append("range", range)
+							.append("range", convertrange)
 							.append("trend", 0)
 							.append("currentprice", price)
 							.append("headupdate", new Date())
-							.append("tailupdate", new Date())
+							.append("convertupdate", new Date())
 							.append("updatedate", new Date());
 						
 							db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
@@ -337,8 +343,12 @@ public class Stock {
 						} else {
 							
 							//趋势无变化，更新当前价格
+							
+							double range = (price - tailprice) / tailprice;
+							
 							newupdate.append("currentprice", price)
 							.append("during", during + 1)
+							.append("range", range)
 							.append("updatedate", new Date());
 						
 							db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
@@ -352,6 +362,65 @@ public class Stock {
 				}
 			}
 		
+		}
+	}
+	
+	static public void initPriceTreand(MainDB db) {
+		
+		String datestamp = "2017021909";
+		
+		initPriceTrendByTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSHDAYDATA, "SH", ConfigConstant.PRICETRENDCONVERTPOINT);
+		
+		initPriceTrendByTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSZDAYDATA, "SZ", ConfigConstant.PRICETRENDCONVERTPOINT);
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	static public void initPriceTrendByTrader(MainDB db, String datestamp, String trader, String base, double convert) {
+		
+		FindIterable<Document> rs = db.getDb().getCollection(trader).find(new Document("version", new Document("$ne", datestamp)));
+		
+		rs = rs.projection(new Document()
+				.append("code", 1)
+				.append("name", 1)
+				.append("base", 1)
+				.append("normal", 1));
+		
+		for(Iterator<Document> i = rs.iterator(); i.hasNext();) {
+			
+			Document item = i.next();
+			
+			String code = item.getString("code");
+			
+			String name = item.getString("name");
+			
+			List<Document> prices = (ArrayList<Document>)item.get("normal");
+			
+			db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).insertOne(new Document()
+					.append("code", code)
+					.append("name", name)
+					.append("base", base));
+			
+			db.getDb().getCollection(trader).updateOne(new Document("code", code), new Document()
+					.append("$set", new Document("version", datestamp)));
+			
+			int count = 14;
+			
+			if (prices.size() < 15) {
+				
+				count = prices.size();
+				
+			}
+			
+			for (int j = count; j >= 0; j--) {
+				
+				Document value = prices.get(j);
+				
+				computePriceTrend(db, code, base, 0.07,value);
+				
+			}
+			
+			
 		}
 		
 	}

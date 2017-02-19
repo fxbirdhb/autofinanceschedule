@@ -26,7 +26,7 @@ public class Main {
 			
 			if (ldate.getDayOfWeek() == DayOfWeek.SUNDAY || ldate.getDayOfWeek() == DayOfWeek.MONDAY) {
 				
-				return;
+				//return;
 				
 			}
 			
@@ -42,12 +42,15 @@ public class Main {
 			
 			String xqcookietoken = "";
 			
+			double convert = ConfigConstant.PRICETRENDCONVERTPOINT;
+			
 			if (doc != null) {
 				
 				xqcookiename = doc.getString("xqcookiename");
 				
 				xqcookietoken = doc.getString("xqcookietoken");
-				
+
+				convert = doc.getDouble("pricetrendconvertpoint");
 			}
 
 			Stock.xqcookiename = xqcookiename;
@@ -70,7 +73,7 @@ public class Main {
 			
 			log.InsertLog("\n------update all stocks price---------\n");
 			
-			Stock.updateCurrentPrice(db, "2017", log);
+			Stock.updateCurrentPrice(db, "2017", convert, log);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
