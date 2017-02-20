@@ -264,6 +264,11 @@ public class Stock {
 						if ((convertrange > convert) || (price > tailprice) ) {
 						
 							//当前价格高于头部的幅度超过限定值，趋势反转向上,原头部价格变为尾部价格
+							
+							Document oldtrend = new Document()
+									.append("minprice", tailprice)
+									.append("maxprice", headprice)
+									.append("during", during);
 						
 							newupdate.append("headprice", price)
 							.append("tailprice", headprice)
@@ -276,7 +281,8 @@ public class Stock {
 							.append("updatedate", new Date());
 						
 							db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
-									.append("$set", newupdate), option);
+									.append("$set", newupdate)
+									.append("$addToSet", new Document("trends", oldtrend)), option);
 						
 							return;
 						
@@ -326,6 +332,11 @@ public class Stock {
 							
 							//当前价格低于头部超过限定值，趋势反转向下
 						
+							Document oldtrend = new Document()
+									.append("minprice", tailprice)
+									.append("maxprice", headprice)
+									.append("during", during);
+							
 							newupdate.append("headprice", price)
 							.append("tailprice", headprice)
 							.append("during", 1)
@@ -337,7 +348,8 @@ public class Stock {
 							.append("updatedate", new Date());
 						
 							db.getDb().getCollection(DBDATA.SOURCEDB_COLLECTION_STOCKPRICETREND).updateOne(filter, new Document()
-									.append("$set", newupdate), option);
+									.append("$set", newupdate)
+									.append("$addToSet", new Document("trends", oldtrend)), option);
 						
 							return;
 						} else {
