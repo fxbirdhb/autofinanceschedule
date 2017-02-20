@@ -24,9 +24,9 @@ public class Main {
 			
 			//as sunday and monday not to update the data
 			
-			if (ldate.getDayOfWeek() == DayOfWeek.SUNDAY || ldate.getDayOfWeek() == DayOfWeek.MONDAY) {
+			if (ldate.getDayOfWeek() == DayOfWeek.SUNDAY || ldate.getDayOfWeek() == DayOfWeek.SATURDAY) {
 				
-				//return;
+				return;
 				
 			}
 			
