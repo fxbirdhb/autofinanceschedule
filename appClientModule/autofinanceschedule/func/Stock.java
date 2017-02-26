@@ -55,19 +55,19 @@ public class Stock {
 		
 		option.upsert(true);
 		
-		FindIterable<Document> rs = db.getDb().getCollection(trader).find();
+		LocalDate date = LocalDate.now();
+		  
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		  
+		String version = date.format(formatter);
+		
+		FindIterable<Document> rs = db.getDb().getCollection(trader).find(new Document("version", new Document("$ne", version)));
 		
 		rs = rs.projection(new Document()
 				.append("code", 1)
 				.append("lastdate", 1));
 		
 		int updatecount = 0;
-		
-		LocalDate date = LocalDate.now();
-		  
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		  
-		String version = date.format(formatter);
 		
 		for(Iterator<Document> i = rs.iterator(); i.hasNext();) {
 			
@@ -1121,7 +1121,7 @@ public class Stock {
 			
 			String base = item.getString("base");
 			
-			if (Stock.updateCurrentRZRQStock(db, code, base, name, pagesize)) {
+			if (Stock.updateCurrentRZRQStock(db, code, name, base, pagesize)) {
 				
 				updatecount++;
 				

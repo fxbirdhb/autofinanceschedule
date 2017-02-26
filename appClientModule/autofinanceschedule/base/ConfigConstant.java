@@ -42,6 +42,8 @@ public class ConfigConstant {
 	
 	public static final String XUEQIU_DAYTRADE = "https://xueqiu.com/stock/forchartk/stocklist.json?symbol=%s&period=%s&type=%s&begin=%s&end=%s";
 	
+	//https://xueqiu.com/stock/forchartk/stocklist.json?symbol=SH600816&period=1day&type=before&end=1456156800000&_=1487670196961  : for all data
+	
 	public static final String EASTMONEY_RZRQ = "http://datainterface.eastmoney.com/EM_DataCenter/JS.aspx?type=FD&sty=SHSZHSSUM&p=%s";
 	
 	public static final String EASTMONEY_RZRQ_STOCK = "http://datainterface.eastmoney.com/EM_DataCenter/JS.aspx?type=FD&sty=MTE&mkt=%s&code=%s&p=%s";
