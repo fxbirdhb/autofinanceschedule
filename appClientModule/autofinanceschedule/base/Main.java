@@ -42,6 +42,10 @@ public class Main {
 			
 			String xqcookietoken = "";
 			
+			String emcookiename = "";
+			
+			String emcookievalue = "";
+			
 			double convert = ConfigConstant.PRICETRENDCONVERTPOINT;
 			
 			if (doc != null) {
@@ -49,6 +53,10 @@ public class Main {
 				xqcookiename = doc.getString("xqcookiename");
 				
 				xqcookietoken = doc.getString("xqcookietoken");
+				
+				emcookiename = doc.getString("emcookiename");
+				
+				emcookievalue = doc.getString("emcookievalue");
 
 				convert = doc.getDouble("pricetrendconvertpoint");
 			}
@@ -57,11 +65,11 @@ public class Main {
 			
 			Stock.xqcookietoken = xqcookietoken;
 			
+			Stock.emcookiename = emcookiename;
+			
+			Stock.emcookievalue = emcookievalue;
+			
 			//update the total rzrq
-			
-			log.InsertLog("\n------update rzrq ---------\n");
-			
-			Stock.updateCurrentRZRQ(db, 1);
 			
 			//update the rzrq of the stock
 			
@@ -69,11 +77,23 @@ public class Main {
 			
 			Stock.updateCurrentRZRQAllStock(db, 1, log);
 			
+			log.InsertLog("\n------update rzrq ---------\n");
+			
+			Stock.updateCurrentRZRQ(db, 1);
+			
 			//update the trade price 
 			
 			log.InsertLog("\n------update all stocks price---------\n");
 			
-			Stock.updateCurrentPrice(db, "2017", convert, log);
+			if (ldate.getDayOfWeek() == DayOfWeek.SATURDAY) {
+				
+				Stock.updateCurrentPrice(db, "2017", convert, log, 0);
+				
+			} else {
+				
+				Stock.updateCurrentPrice(db, "2017", convert, log, 1);
+			}
+			
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

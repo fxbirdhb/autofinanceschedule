@@ -47,6 +47,8 @@ public class ConfigConstant {
 	public static final String EASTMONEY_RZRQ = "http://datainterface.eastmoney.com/EM_DataCenter/JS.aspx?type=FD&sty=SHSZHSSUM&p=%s";
 	
 	public static final String EASTMONEY_RZRQ_STOCK = "http://datainterface.eastmoney.com/EM_DataCenter/JS.aspx?type=FD&sty=MTE&mkt=%s&code=%s&p=%s";
+	
+	public static final String EASTMONEY_RZRQ_STOCK_SZ = "http://datainterface.eastmoney.com/EM_DataCenter/JS.aspx?type=FD&sty=MTE&mkt=%s&code=%s";
 
 	public static final String XUEQIU_STOCKTYPE_TAG = "土木工程建筑";
 	
@@ -67,5 +69,9 @@ public class ConfigConstant {
 	public static final String MONTHDATA_TITLE = "代码,名称,年份,开盘价,收盘价,年涨跌幅,最高月收盘价,最低月收盘价,峰值涨跌幅 \n";
 	
 	public static final double PRICETRENDCONVERTPOINT = 0.05;
+	
+	public static final String EASTMONEY_COOKIEVALUE = "GA1.2.1362863081.1488839097";
+	
+	public static final String EASTMONEY_COOKIENAME = "_ga";
 	
 }

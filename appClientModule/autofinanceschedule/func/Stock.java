@@ -29,16 +29,20 @@ public class Stock {
 	
 	static public String xqcookietoken = ConfigConstant.XUEQIU_TOKEN;
 	
+	static public String emcookiename = ConfigConstant.EASTMONEY_COOKIENAME;
+	
+	static public String emcookievalue = ConfigConstant.EASTMONEY_COOKIEVALUE;
+	
 	/**
 	 * Update current prices of two share markets
 	 * @param db
 	 * @throws Exception
 	 */
-	static public void updateCurrentPrice(MainDB db, String datestamp, double convert, logbase log) throws Exception {
+	static public void updateCurrentPrice(MainDB db, String datestamp, double convert, logbase log, int investment) throws Exception {
 		
-		updateForTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSHDAYDATA, "SH", convert, log);
+		updateForTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSHDAYDATA, "SH", convert, log, investment);
 		
-		updateForTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSZDAYDATA, "SZ", convert, log);
+		updateForTrader(db, datestamp, DBDATA.SOURCEDB_COLLECTION_STOCKSZDAYDATA, "SZ", convert, log, investment);
 	}
 	
 	/**
@@ -49,7 +53,7 @@ public class Stock {
 	 * @param base
 	 * @throws Exception
 	 */
-	static public void updateForTrader(MainDB db, String datestamp, String trader, String base, double convert, logbase log) throws Exception {
+	static public void updateForTrader(MainDB db, String datestamp, String trader, String base, double convert, logbase log, int investment) throws Exception {
 	    
 	    UpdateOptions option = new UpdateOptions();
 		
@@ -61,7 +65,20 @@ public class Stock {
 		  
 		String version = date.format(formatter);
 		
-		FindIterable<Document> rs = db.getDb().getCollection(trader).find(new Document("version", new Document("$ne", version)));
+		Document filter = null;
+		
+		if (investment == 1) {
+			
+			filter = new Document()
+					.append("investment", investment)
+					.append("version", new Document("$ne", version));
+			
+		} else {
+			
+			filter = new Document("version", new Document("$ne", version));
+		}
+		
+		FindIterable<Document> rs = db.getDb().getCollection(trader).find(filter);
 		
 		rs = rs.projection(new Document()
 				.append("code", 1)
@@ -1240,11 +1257,45 @@ public class Stock {
 			
 		}
 		
+		BasicCookieStore cookieStore = new BasicCookieStore();
+
+	    BasicClientCookie cookie = new BasicClientCookie(emcookiename, emcookievalue);
+	    
+	    BasicClientCookie cookiegt = new BasicClientCookie("_gat", "1");
+	    
+	    BasicClientCookie cookiestpvi = new BasicClientCookie("st_pvi", "28134744292580");
+	    
+	    BasicClientCookie cookiestsi = new BasicClientCookie("st_si", "25909422346456");
+	    
+	    cookie.setDomain(".eastmoney.com");
+	    
+	    cookie.setPath("/");
+	    
+	    cookiegt.setDomain(".eastmoney.com");
+	    
+	    cookiegt.setPath("/");
+	    
+	    cookiestpvi.setDomain(".eastmoney.com");
+	    
+	    cookiestpvi.setPath("/");
+	    
+	    cookiestsi.setDomain(".eastmoney.com");
+	    
+	    cookiestsi.setPath("/");
+	    
+	    cookieStore.addCookie(cookie);
+	    
+	    cookieStore.addCookie(cookiegt);
+	    
+	    cookieStore.addCookie(cookiestpvi);
+	    
+	    cookieStore.addCookie(cookiestsi);
+	    
 		for (int i = 1; i <= pagesize; i++) {
 		
 			String url = String.format(ConfigConstant.EASTMONEY_RZRQ_STOCK, mkt, code, String.valueOf(i));
 		
-			String WholePage = RetrieveWeb.GetPage(url);
+			String WholePage = RetrieveWeb.GetPage(url, cookieStore);
 			
 			if (WholePage.equals("")) {
 				
