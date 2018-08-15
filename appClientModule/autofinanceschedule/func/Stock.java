@@ -102,7 +102,7 @@ public class Stock {
 
 			if ((normal != null) && (!normal.isEmpty())) {
 				
-				computePriceTrend(db, code, base, convert, normal.get(0));
+				computePriceTrend(db, code, base, convert, normal.get(normal.size() - 1));
 				
 				List<Document> before = getCurrentPrice(db, trader, code, base, "1day", "before", begin, end);
 				
